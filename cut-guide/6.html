@@ -110,6 +110,17 @@ dialog img{display:block;max-width:100%;max-height:80vh;border-radius:4px}
 @media(max-width:600px){.hero .wrap,.brief .wrap{grid-template-columns:minmax(0,1fr)}.figs.n3{grid-template-columns:repeat(2,minmax(0,1fr))}
  table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px;border-bottom:1px solid var(--line)}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:7em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:6.5em;margin-inline-start:-7em;color:var(--mut);white-space:normal}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.ph img{transition:none}}
+</style><style id="cg-prog-css">
+.cg-done{margin-left:auto;align-self:center;flex:none;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:500 14px "Noto Sans KR",sans-serif;cursor:pointer;white-space:nowrap}
+.cg-done:hover{border-color:var(--ink)}.cg-done:focus-visible{outline:3px solid #e2a628;outline-offset:2px}
+.cg-done[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f;color:#fff}
+.step.is-done .no{color:#2f7d4f}
+nav.steps a.dn em::after{content:" ✓";color:#2f7d4f}
+.cg-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 0;font-size:14px}
+.cg-bar .trk{flex:1;min-width:140px;height:6px;background:var(--line);border-radius:99px;overflow:hidden}.cg-bar .trk i{display:block;height:100%;background:#2f7d4f;width:0}
+.cg-bar a{color:var(--acc);font-weight:700;white-space:nowrap}
+.cg-bar button{min-height:36px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:none;color:var(--mut);font:13px "Noto Sans KR",sans-serif;cursor:pointer}
+@media(max-width:600px){.sh{flex-wrap:wrap}.cg-done{margin-left:0}}
 </style></head><body>
 
 <div class="gsw"><div class="wrap"><a href="./">← 목록</a><a href="1.html" class="">1 · 투블럭 상고 (숱 많고 뜨는 머리)</a><a href="2.html" class="">2 · 남자 커트 공식 (5C)</a><a href="3.html" class="">3 · 학생 투블럭 상고</a><a href="4.html" class="">4 · 남자머리 망하지 않게 (미르쌤)</a><a href="5.html" class="">5 · 원블럭·투블럭 층 이해</a><a href="6.html" class="on">6 · 남자 짧은 머리 (미르쌤)</a><a href="7.html" class="">7 · 리프컷 (미르쌤)</a></div></div>
@@ -421,4 +432,33 @@ const links=[...document.querySelectorAll("nav.steps a")];
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id));const on=links.find(a=>a.classList.contains("on"));if(on){const bar=on.parentElement;bar.scrollTo({left:on.offsetLeft-bar.clientWidth/2+on.clientWidth/2,behavior:"smooth"});}}}),{rootMargin:"-45% 0px -50% 0px"});
 document.querySelectorAll(".step,#ref,#quiz").forEach(s=>io.observe(s));
 }</script>
-</body></html>
+<script id="cg-prog-js">{
+const K="cg:"+(location.pathname.split("/").pop()||"index.html");
+const load=()=>{try{return JSON.parse(localStorage.getItem(K))||{}}catch(e){return {}}};
+const save=d=>{try{localStorage.setItem(K,JSON.stringify(d))}catch(e){}};
+let D=load(); D.done=D.done||[];
+const steps=[...document.querySelectorAll(".step")]; D.total=steps.length; D.title=document.querySelector("h1")?.textContent||""; save(D);
+const nav=document.querySelector("nav.steps");
+const bar=document.createElement("div"); bar.className="wrap cg-bar";
+nav&&nav.insertAdjacentElement("afterend",bar);
+const paint=()=>{
+  steps.forEach(s=>{const on=D.done.includes(s.id);s.classList.toggle("is-done",on);const b=s.querySelector(".cg-done");if(b){b.setAttribute("aria-pressed",on);b.textContent=on?"✓ 다 봤어요":"다 봤으면 체크"}});
+  document.querySelectorAll("nav.steps a").forEach(a=>a.classList.toggle("dn",D.done.includes((a.getAttribute("href")||"").slice(1))));
+  const n=D.done.filter(id=>steps.some(s=>s.id===id)).length;
+  const next=steps.find(s=>!D.done.includes(s.id));
+  const last=D.last&&document.getElementById(D.last);
+  bar.innerHTML=`<span><b>${n}</b> / ${steps.length} 단계 봤어요</span><span class="trk"><i style="width:${n/steps.length*100}%"></i></span>`+
+   (last?`<a href="#${D.last}">마지막으로 본 곳: ${last.querySelector("h2").textContent} →</a>`:"")+
+   (next&&next!==last?`<a href="#${next.id}">안 본 단계: ${next.querySelector("h2").textContent} →</a>`:"")+
+   (n?`<button type="button" id="cg-reset">기록 지우기</button>`:"");
+  const r=document.getElementById("cg-reset"); r&&(r.onclick=()=>{D.done=[];delete D.last;save(D);paint()});
+};
+steps.forEach(s=>{const b=document.createElement("button");b.type="button";b.className="cg-done";
+  b.onclick=()=>{const i=D.done.indexOf(s.id);i<0?D.done.push(s.id):D.done.splice(i,1);D.last=s.id;save(D);paint()};
+  s.querySelector(".sh").appendChild(b)});
+document.querySelectorAll(".play").forEach(p=>p.addEventListener("click",()=>{const st=p.closest(".step");if(st){D.last=st.id;save(D);paint()}}));
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){D.last=e.target.id;save(D)}}),{rootMargin:"-45% 0px -50% 0px"});
+steps.forEach(x=>io.observe(x));
+addEventListener("pagehide",paint);
+paint();
+}</script></body></html>
