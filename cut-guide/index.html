@@ -406,7 +406,7 @@ if(location.protocol==="file:")document.getElementById("hint").style.display="bl
 document.querySelectorAll(".player").forEach(p=>{
   p.querySelector(".play").addEventListener("click",()=>{
     const f=document.createElement("iframe");
-    f.src=`https://www.youtube.com/embed/${VID}?start=${p.dataset.a}&end=${p.dataset.b}&autoplay=${matchMedia("(pointer:coarse)").matches?0:1}&rel=0&playsinline=1`;
+    f.src=`https://www.youtube.com/embed/${VID}?start=${p.dataset.a}&end=${p.dataset.b}&autoplay=1&rel=0&playsinline=1`;
     f.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";f.allowFullscreen=true;
     f.referrerPolicy="strict-origin-when-cross-origin";f.title="구간 재생";
     p.innerHTML="";p.appendChild(f);
